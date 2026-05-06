@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="العروض">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#059669">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>عروض العقارات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#059669;--primary-d:#047857;--primary-light:#d1fae5;
+  --bg:#022c22;--surf:#0a3728;--surf2:#051a14;
+  --border:rgba(5,150,105,.18);
+  --text:#ecfdf5;--muted:#6ee7b7;--dim:#34d399;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+  /* Direction colors: north=red, south=yellow, east=blue, west=green */
+  --dir-n-bg:#fef2f2;--dir-n-bd:#fca5a5;--dir-n-badge:#ef4444;--dir-n-text:#991b1b;
+  --dir-s-bg:#fefce8;--dir-s-bd:#fde047;--dir-s-badge:#ca8a04;--dir-s-text:#713f12;
+  --dir-e-bg:#eff6ff;--dir-e-bd:#93c5fd;--dir-e-badge:#2563eb;--dir-e-text:#1e3a8a;
+  --dir-w-bg:#f0fdf4;--dir-w-bd:#86efac;--dir-w-badge:#16a34a;--dir-w-text:#14532d;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100%}
+input,select,textarea{font-size:16px!important;font-family:'Tajawal',sans-serif}
+
+@media(max-width:639px){
+  body{position:fixed;width:100%;top:0;left:0;right:0;bottom:0;overflow:hidden}
+  #app{height:100%;overflow:hidden}
+  .scroll{overflow-y:auto;-webkit-overflow-scrolling:touch}
+}
+@media(min-width:640px){
+  body{padding:calc(var(--st)+16px) 16px calc(var(--sb)+16px);background:#010f09}
+  #app{border-radius:22px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+  .scroll{overflow-y:auto;max-height:calc(100vh - 260px)}
+}
+
+#app{display:flex;flex-direction:column;width:100%;max-width:680px;margin:0 auto;background:var(--bg);position:relative}
+
+/* Header */
+.hdr{background:linear-gradient(160deg,#0a3728 0%,#022c22 100%);padding:calc(var(--st)+12px) 16px 12px;border-bottom:2px solid rgba(5,150,105,.3);flex-shrink:0}
+.hdr-row{display:flex;align-items:center;gap:11px}
+.hdr-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--primary),var(--primary-d));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 20px rgba(5,150,105,.5)}
+.hdr-title{font-size:17px;font-weight:900;color:var(--text);line-height:1.2}
+.hdr-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:2px}
+.sdot{width:7px;height:7px;border-radius:50%;background:#34d399;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* Stats bar */
+.stats{display:flex;gap:7px;margin-top:11px;overflow-x:auto;padding-bottom:1px;scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}
+.stat{flex:0 0 auto;border-radius:10px;padding:7px 14px;text-align:center;border:1.5px solid;min-width:64px;cursor:pointer;transition:transform .13s,box-shadow .13s}
+.stat:active{transform:scale(.93)}
+.stat.on{box-shadow:0 0 0 2.5px var(--primary)}
+.stat-n{font-size:21px;font-weight:900;line-height:1}
+.stat-l{font-size:10px;color:#64748b;margin-top:1px}
+
+/* Scroll */
+.scroll{flex:1;overscroll-behavior:contain;padding:12px 13px 6px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+/* Tabs */
+.tabs{display:flex;background:#051a14;border-top:1px solid rgba(5,150,105,.2);flex-shrink:0;padding-bottom:var(--sb)}
+.tab{flex:1;padding:9px 0 7px;border:none;background:transparent;color:#34d399;font-size:11px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:700;border-top:2.5px solid transparent;transition:all .18s;touch-action:manipulation;-webkit-user-select:none;user-select:none;opacity:.5}
+.tab.on{color:var(--primary);border-top-color:var(--primary);opacity:1}
+.tab-ic{font-size:19px;display:block;margin-bottom:2px}
+
+/* Inputs */
+.inp{width:100%;padding:12px 13px;border-radius:11px;border:1.5px solid #134e36;background:#051a14;color:var(--text);font-size:16px;font-family:'Tajawal',sans-serif;-webkit-appearance:none;outline:none;transition:border-color .18s,box-shadow .18s}
+.inp:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(5,150,105,.2)}
+.inp.dup-warn{border-color:#f97316!important;box-shadow:0 0 0 3px rgba(249,115,22,.2)!important}
+textarea.inp{resize:vertical}
+.lbl{display:block;color:var(--muted);font-size:12px;margin-bottom:5px;font-weight:700}
+.field{margin-bottom:13px}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
+
+/* Buttons */
+.btn{border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s;-webkit-user-select:none;user-select:none;touch-action:manipulation;width:100%;display:block}
+.btn:active{transform:scale(.96)}
+.b-primary{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;box-shadow:0 4px 18px rgba(5,150,105,.35)}
+.b-red{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff}
+.b-ghost{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(5,150,105,.2)}
+.b-export{background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff}
+.b-orange{background:linear-gradient(135deg,#ea580c,#c2410c);color:#fff}
+
+/* Chip */
+.chip{display:inline-block;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:800;color:#fff}
+
+/* Direction buttons - unified colors */
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dbtn{border-radius:11px;padding:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s;touch-action:manipulation;border-width:2px;border-style:solid}
+.dbtn:active{transform:scale(.95)}
+
+/* Type buttons */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tbtn{border-radius:11px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s;touch-action:manipulation;border:2px solid #134e36;background:rgba(255,255,255,.03);color:var(--muted)}
+.tbtn.on{border-color:var(--primary);background:rgba(5,150,105,.15);color:#34d399}
+.tbtn:active{transform:scale(.95)}
+
+/* Filter pills */
+.filter-row{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.fpill{flex:0 0 auto;padding:5px 13px;border-radius:20px;font-size:12px;font-weight:800;border:1.5px solid #134e36;background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;font-family:'Tajawal',sans-serif;touch-action:manipulation;transition:all .15s}
+.fpill.on{background:rgba(5,150,105,.18);border-color:var(--primary);color:#34d399}
+.fpill:active{transform:scale(.94)}
+
+/* Card */
+.card{border-radius:14px;padding:13px 14px;margin-bottom:9px;border-width:1.5px;border-style:solid;cursor:pointer;transition:transform .13s,filter .13s;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.card:active{transform:scale(.985);filter:brightness(.88)}
+.card.dup-card{outline:2px solid #f97316;outline-offset:1px}
+
+/* Overlay / Sheet */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fIn .2s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.sheet{background:#0a3728;border-radius:22px 22px 0 0;width:100%;max-width:680px;padding:22px 18px;padding-bottom:calc(22px + var(--sb));max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;animation:sUp .22s ease}
+.sheet::-webkit-scrollbar{display:none}
+@keyframes sUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Toast */
+.toast{position:fixed;top:calc(var(--st)+14px);left:50%;transform:translateX(-50%);z-index:999;color:#fff;padding:10px 20px;border-radius:12px;font-weight:800;font-size:13px;font-family:'Tajawal',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.55);white-space:nowrap;max-width:90vw;animation:tIn .22s ease}
+@keyframes tIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Detail */
+.det-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(5,150,105,.12)}
+.det-k{color:#6ee7b7;font-size:13px}
+.det-v{color:var(--text);font-size:13px;font-weight:700;max-width:60%;text-align:left;word-break:break-all}
+.act-row{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
+.act-row .btn{flex:1;min-width:80px}
+
+/* Search row */
+.srow{display:flex;gap:8px;margin-bottom:10px}
+.swrap{flex:1;position:relative}
+.sic{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:14px;pointer-events:none}
+.sinp{padding-right:36px}
+
+/* Empty */
+.empty{text-align:center;color:#34d399;padding:55px 20px;opacity:.6}
+.e-ic{font-size:50px;margin-bottom:11px}
+.e-t{font-size:15px;font-weight:800;color:var(--muted)}
+.e-s{color:#34d399;font-size:12px;margin-top:5px;opacity:.7}
+
+/* Install banner */
+.install-banner{background:linear-gradient(135deg,rgba(5,150,105,.12),rgba(5,150,105,.05));border:1px solid rgba(5,150,105,.3);border-radius:12px;padding:11px 14px;margin-bottom:13px;display:flex;align-items:center;gap:10px}
+.install-banner-text{flex:1;font-size:12px;color:var(--muted);line-height:1.4}
+.install-banner-title{font-size:13px;font-weight:800;color:var(--primary);margin-bottom:2px}
+.install-x{background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:4px;touch-action:manipulation;line-height:1}
+
+/* Misc */
+.sec-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:var(--text);margin-bottom:16px}
+.form-note{text-align:center;color:#34d399;font-size:11px;margin-top:14px;opacity:.6}
+.active-filters{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.af-tag{background:rgba(5,150,105,.15);border:1px solid rgba(5,150,105,.35);color:#34d399;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.af-x{cursor:pointer;font-size:13px;line-height:1}
+.dup-warn-box{background:rgba(249,115,22,.12);border:1.5px solid rgba(249,115,22,.4);border-radius:10px;padding:10px 13px;margin-bottom:12px;color:#fed7aa;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div class="hdr-icon">🏡</div>
+      <div style="flex:1;min-width:0">
+        <div class="hdr-title">عروض العقارات</div>
+        <div class="hdr-sub">
+          <span class="sdot" id="sdot"></span>
+          <span id="stxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">جاري التحميل...</span>
+        </div>
+      </div>
+    </div>
+    <div class="stats" id="statsRow"></div>
+  </div>
+  <div class="scroll" id="scroll"></div>
+  <div class="tabs">
+    <button class="tab on" id="t0" onclick="goTab(0)"><span class="tab-ic">📋</span>العروض</button>
+    <button class="tab" id="t1" onclick="goTab(1)"><span class="tab-ic">➕</span>إضافة</button>
+    <button class="tab" id="t2" onclick="goTab(2)"><span class="tab-ic">📊</span>إحصائيات</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="display:none"></div>
+
+<!-- Delete overlay -->
+<div class="overlay" id="delOverlay" style="display:none" onclick="closeOverlay('delOverlay')">
+  <div class="sheet" onclick="event.stopPropagation()" style="text-align:center">
+    <div style="font-size:46px;margin-bottom:8px">🗑️</div>
+    <div style="font-size:16px;font-weight:900;margin-bottom:5px;color:var(--text)">حذف العرض؟</div>
+    <div style="color:var(--muted);font-size:12px;margin-bottom:22px">لا يمكن التراجع عن هذا الإجراء</div>
+    <div style="display:flex;gap:9px">
+      <button class="btn b-red" onclick="confirmDel()">نعم، احذف</button>
+      <button class="btn b-ghost" onclick="closeOverlay('delOverlay')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail overlay -->
+<div class="overlay" id="detOverlay" style="display:none" onclick="closeOverlay('detOverlay')">
+  <div class="sheet" id="detSheet" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+// ── Direction colors: unified across both apps ──────────────
+const DC = {
+  'شمال':{bg:'#fef2f2',border:'#fca5a5',badge:'#ef4444',text:'#991b1b'},
+  'جنوب':{bg:'#fefce8',border:'#fde047',badge:'#ca8a04',text:'#713f12'},
+  'شرق': {bg:'#eff6ff',border:'#93c5fd',badge:'#2563eb',text:'#1e3a8a'},
+  'غرب': {bg:'#f0fdf4',border:'#86efac',badge:'#16a34a',text:'#14532d'},
+};
+const DIRS = ['شمال','جنوب','شرق','غرب'];
+const TYPES = ['أرض','فيلا','عمارة','شقة','محل','دور'];
+const KEY = 'offers_v1';
+const INSTALL_KEY = 'offers_install_dismissed';
+
+// ── State ────────────────────────────────────────────────────
+let offers = [], tab = 0, editId = null, delId = null, showBanner = false;
+let search = '', filterDirs = [], filterTypes = [];
+let toastT = null;
+let dupWarn = null; // {field, value}
+
+const EF = () => ({direction:'',ownerName:'',ownerPhone:'',neighborhood:'',price:'',area:'',propertyType:''});
+let form = EF();
+
+// ── Init ─────────────────────────────────────────────────────
+function init(){
+  try{offers = JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){offers=[];}
+  showBanner = !localStorage.getItem(INSTALL_KEY) && !window.matchMedia('(display-mode: standalone)').matches;
+  render();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(offers));}catch(e){}render();}
+
+// ── Toast ────────────────────────────────────────────────────
+function toast(msg, type='ok'){
+  clearTimeout(toastT);
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.style.display = 'block';
+  el.style.background = type==='err'?'#dc2626':type==='info'?'#0284c7':type==='warn'?'#ea580c':'#059669';
+  toastT = setTimeout(()=>el.style.display='none', 3500);
+}
+
+// ── Sync text inputs ─────────────────────────────────────────
+function syncFormFromDOM(){
+  ['ownerName','ownerPhone','neighborhood','area','price'].forEach(k=>{
+    const el = document.getElementById('f_'+k);
+    if(el) form[k] = el.value;
+  });
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function goTab(n){
+  if(tab===1) syncFormFromDOM();
+  tab = n;
+  if(n!==1 && editId){editId=null;form=EF();dupWarn=null;}
+  [0,1,2].forEach(i=>document.getElementById('t'+i).className='tab'+(i===n?' on':''));
+  render();
+}
+function closeOverlay(id){document.getElementById(id).style.display='none';}
+
+// ── Filter toggles ───────────────────────────────────────────
+function toggleDirFilter(d){
+  const i = filterDirs.indexOf(d);
+  if(i>=0) filterDirs.splice(i,1); else filterDirs.push(d);
+  if(tab!==0) goTab(0); else render();
+}
+function toggleTypeFilter(t){
+  const i = filterTypes.indexOf(t);
+  if(i>=0) filterTypes.splice(i,1); else filterTypes.push(t);
+  render();
+}
+function clearFilters(){filterDirs=[];filterTypes=[];render();}
+
+// ── Filtered list ────────────────────────────────────────────
+function filtered(){
+  let res = offers;
+  if(search.trim()){
+    const q = search.trim();
+    res = res.filter(o=>[o.ownerName,o.ownerPhone,o.direction,o.propertyType,o.neighborhood].some(v=>v&&v.includes(q)));
+  }
+  if(filterDirs.length) res = res.filter(o=>filterDirs.includes(o.direction));
+  if(filterTypes.length) res = res.filter(o=>filterTypes.includes(o.propertyType));
+  return res;
+}
+
+// ── Check duplicates ─────────────────────────────────────────
+function findDup(phone, excludeId){
+  return offers.find(o=>o.ownerPhone && o.ownerPhone===phone && o.id!==excludeId);
+}
+
+// ── Render ───────────────────────────────────────────────────
+function render(){
+  renderStats();
+  document.getElementById('stxt').textContent = offers.length+' عرض • محفوظ على جهازك';
+  const sc = document.getElementById('scroll');
+  if(tab===0)      sc.innerHTML = renderList();
+  else if(tab===1) sc.innerHTML = renderForm();
+  else             sc.innerHTML = renderStats2();
+}
+
+function renderStats(){
+  document.getElementById('statsRow').innerHTML = DIRS.map(d=>{
+    const c=DC[d], n=offers.filter(o=>o.direction===d).length;
+    const active = filterDirs.includes(d);
+    return '<div class="stat'+(active?' on':'')+'" style="background:'+c.badge+'22;border-color:'+c.border+'" onclick="toggleDirFilter(\''+d+'\')">'+
+      '<div class="stat-n" style="color:'+c.badge+'">'+n+'</div>'+
+      '<div class="stat-l" style="color:'+c.badge+'88">'+d+(active?' ✓':'')+'</div></div>';
+  }).join('');
+}
+
+// ── List tab ──────────────────────────────────────────────────
+function renderList(){
+  const fil = filtered();
+  let h = '';
+  if(showBanner){
+    h += '<div class="install-banner"><div style="font-size:28px">📲</div><div class="install-banner-text"><div class="install-banner-title">أضف التطبيق للشاشة الرئيسية</div>اضغط <b>مشاركة ↑</b> ثم «إضافة إلى الشاشة الرئيسية»</div><button class="install-x" onclick="dismissBanner()">✕</button></div>';
+  }
+
+  // Search + Export
+  h += '<div class="srow">'+
+    '<div class="swrap"><span class="sic">🔍</span>'+
+    '<input id="searchInp" class="inp sinp" type="search" placeholder="بحث..." value="'+x(search)+'" oninput="onSearch(this.value)" autocomplete="off" spellcheck="false"></div>'+
+    '<button class="btn b-export" onclick="exportJSON()" title="تصدير JSON" style="min-width:48px;padding:0 12px;width:auto">📤 تصدير</button>'+
+    '</div>';
+
+  // Active filter tags
+  const anyFilter = filterDirs.length||filterTypes.length;
+  if(anyFilter){
+    h += '<div class="active-filters">';
+    filterDirs.forEach(d=>{const c=DC[d];h+='<span class="af-tag" style="background:'+c.badge+'22;border-color:'+c.badge+'55;color:'+c.badge+'">'+d+' <span class="af-x" onclick="toggleDirFilter(\''+d+'\')">✕</span></span>';});
+    filterTypes.forEach(t=>{h+='<span class="af-tag">'+t+' <span class="af-x" onclick="toggleTypeFilter(\''+t+'\')">✕</span></span>';});
+    h += '<span style="color:var(--dim);font-size:11px;cursor:pointer;text-decoration:underline" onclick="clearFilters()">مسح الكل</span></div>';
+  }
+
+  // Type filter pills
+  h += '<div class="filter-row">'+
+    '<span class="fpill'+(filterTypes.length===0?' on':'')+'" onclick="filterTypes=[];render()">الكل</span>';
+  TYPES.forEach(t=>{
+    const n = offers.filter(o=>o.propertyType===t).length;
+    h += '<span class="fpill'+(filterTypes.includes(t)?' on':'')+'" onclick="toggleTypeFilter(\''+t+'\')">'+t+(n?' ('+n+')':'')+'</span>';
+  });
+  h += '</div>';
+
+  if(!fil.length){
+    h += '<div class="empty"><div class="e-ic">'+(search||anyFilter?'🔍':'🏡')+'</div>'+
+      '<div class="e-t">'+(search||anyFilter?'لا نتائج مطابقة':'لا توجد عروض بعد')+'</div>'+
+      (!search&&!anyFilter?'<div class="e-s">اضغط «إضافة» لإدخال أول عرض</div>':'')+'</div>';
+  } else {
+    // Check for duplicate phones across all offers
+    const phoneCounts = {};
+    offers.forEach(o=>{if(o.ownerPhone) phoneCounts[o.ownerPhone]=(phoneCounts[o.ownerPhone]||0)+1;});
+
+    fil.forEach((o,i)=>{
+      const c = DC[o.direction]||{bg:'#f8fafc',border:'#e2e8f0',badge:'#64748b',text:'#1e293b'};
+      const isDup = o.ownerPhone && phoneCounts[o.ownerPhone]>1;
+      h += '<div class="card'+(isDup?' dup-card':'')+'" style="background:'+c.bg+';border-color:'+c.border+(isDup?';border-color:#f97316':'')+'" onclick="openDetail(\''+o.id+'\')">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">'+
+        '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
+        (o.direction?'<span class="chip" style="background:'+c.badge+'">'+o.direction+'</span>':'')+
+        (o.propertyType?'<span style="color:'+c.text+';font-size:10px;background:'+c.badge+'22;padding:3px 7px;border-radius:6px;font-weight:800">'+o.propertyType+'</span>':'')+
+        (isDup?'<span style="color:#f97316;font-size:10px;background:#f9731622;padding:3px 7px;border-radius:6px;font-weight:800">⚠️ مكرر</span>':'')+
+        '</div><span style="color:#6ee7b7;font-size:10px;opacity:.5">#'+(i+1)+'</span></div>'+
+        '<div style="color:'+c.text+';font-size:15px;font-weight:900;margin-bottom:3px">'+x(o.ownerName||'—')+'</div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<span style="color:#64748b;font-size:11px;direction:ltr">'+x(o.ownerPhone||'')+'</span>'+
+        '<span style="color:'+c.badge+';font-size:14px;font-weight:900">'+(o.price?fp(o.price)+' ﷼':'—')+'</span></div>'+
+        (o.neighborhood?'<div style="color:#64748b;font-size:11px;margin-top:3px">📍 '+x(o.neighborhood)+'</div>':'')+
+        (o.area?'<div style="color:#64748b;font-size:11px;margin-top:2px">📐 '+x(o.area)+' م²</div>':'')+
+        '</div>';
+    });
+  }
+  return h;
+}
+
+// ── Search without full re-render ────────────────────────────
+function onSearch(val){
+  search = val;
+  const sc = document.getElementById('scroll');
+  if(tab===0) sc.innerHTML = renderList();
+  const inp = document.getElementById('searchInp');
+  if(inp){inp.focus();const l=inp.value.length;inp.setSelectionRange(l,l);}
+}
+
+// ── Form tab ──────────────────────────────────────────────────
+function renderForm(){
+  const title = editId?'✏️ تعديل العرض':'➕ إضافة عرض جديد';
+  const dirC = form.direction ? DC[form.direction] : null;
+  const chip = dirC?'<span class="chip" style="background:'+dirC.badge+'">'+form.direction+'</span>':'';
+
+  const dirs = DIRS.map(d=>{
+    const c=DC[d], s=form.direction===d;
+    return '<button class="dbtn" onclick="sf(\'direction\',\''+d+\'\')" style="border-color:'+(s?c.badge:c.border)+';background:'+(s?c.bg+'cc':'rgba(255,255,255,.03)')+';color:'+(s?c.text:'#6ee7b7')+'">'+
+      (s?'✓ ':'')+d+'</button>';
+  }).join('');
+
+  const types = TYPES.map(t=>
+    '<button class="tbtn '+(form.propertyType===t?'on':'')+'" onclick="sf(\'propertyType\',\''+t+'\')">'+t+'</button>'
+  ).join('');
+
+  let dupBox = '';
+  if(dupWarn){
+    dupBox = '<div class="dup-warn-box">⚠️ '+dupWarn+'</div>';
+  }
+
+  const phoneClass = dupWarn ? 'inp dup-warn' : 'inp';
+
+  return '<div style="padding-bottom:18px">'+
+    '<div class="sec-title">'+title+' '+chip+'</div>'+
+    dupBox+
+    '<div class="field"><label class="lbl">الاتجاه</label><div class="dgrid">'+dirs+'</div></div>'+
+    '<div class="field"><label class="lbl">اسم المالك</label><input id="f_ownerName" class="inp" type="text" inputmode="text" placeholder="مثال: محمد العمري" value="'+x(form.ownerName||'')+'" autocomplete="off"></div>'+
+    '<div class="field"><label class="lbl">رقم الجوال</label><input id="f_ownerPhone" class="'+phoneClass+'" type="tel" inputmode="tel" placeholder="05xxxxxxxx" value="'+x(form.ownerPhone||'')+'" oninput="checkDup(this.value)" autocomplete="off" style="direction:ltr;text-align:right"></div>'+
+    '<div class="field"><label class="lbl">الحي / الموقع</label><input id="f_neighborhood" class="inp" type="text" inputmode="text" placeholder="مثال: حي النزهة" value="'+x(form.neighborhood||'')+'" autocomplete="off"></div>'+
+    '<div class="field"><label class="lbl">السعر (ريال)</label><input id="f_price" class="inp" type="text" inputmode="numeric" placeholder="1,200,000" value="'+x(form.price||'')+'" autocomplete="off"></div>'+
+    '<div class="field"><label class="lbl">المساحة (م²)</label><input id="f_area" class="inp" type="number" inputmode="numeric" placeholder="400" value="'+x(form.area||'')+'"></div>'+
+    '<div class="field"><label class="lbl">نوع العقار</label><div class="tgrid">'+types+'</div></div>'+
+    '<button class="btn b-primary" style="font-size:15px;padding:15px;margin-top:4px" onclick="submitForm()">'+(editId?'💾 حفظ التعديل':'✅ إضافة العرض')+'</button>'+
+    (editId?'<button class="btn b-ghost" style="margin-top:9px" onclick="cancelEdit()">إلغاء</button>':'')+
+    '<div class="form-note">💾 البيانات محفوظة على جهازك — بدون إنترنت</div></div>';
+}
+
+// ── Real-time duplicate check ─────────────────────────────────
+function checkDup(phone){
+  syncFormFromDOM();
+  if(phone && phone.length >= 8){
+    const dup = findDup(phone, editId);
+    if(dup){
+      dupWarn = 'رقم الجوال موجود مسبقاً للمالك: '+dup.ownerName+' — سيتم الحفظ مع التمييز';
+      toast('⚠️ رقم الجوال مكرر!','warn');
+    } else {
+      dupWarn = null;
+    }
+    // Re-render the warning box and input border without losing focus
+    const warnBox = document.querySelector('.dup-warn-box');
+    const phoneInp = document.getElementById('f_ownerPhone');
+    if(dupWarn){
+      if(!warnBox){
+        const box = document.createElement('div');
+        box.className = 'dup-warn-box';
+        box.textContent = '⚠️ '+dupWarn;
+        phoneInp&&phoneInp.parentElement&&phoneInp.parentElement.insertBefore(box,phoneInp.parentElement.querySelector('.lbl'));
+      } else {
+        warnBox.textContent = '⚠️ '+dupWarn;
+      }
+      if(phoneInp) phoneInp.className = 'inp dup-warn';
+    } else {
+      if(warnBox) warnBox.remove();
+      if(phoneInp) phoneInp.className = 'inp';
+    }
+  }
+}
+
+// ── Stats tab ─────────────────────────────────────────────────
+function renderStats2(){
+  if(!offers.length) return '<div class="empty"><div class="e-ic">📊</div><div class="e-t">لا توجد بيانات بعد</div></div>';
+  const total = offers.length;
+  const byDir = DIRS.map(d=>({d,n:offers.filter(o=>o.direction===d).length}));
+  const byType = TYPES.map(t=>({t,n:offers.filter(o=>o.propertyType===t).length})).filter(z=>z.n>0);
+  const prices = offers.filter(o=>o.price).map(o=>Number(String(o.price).replace(/,/g,'')));
+  const avgPrice = prices.length?Math.round(prices.reduce((a,b)=>a+b,0)/prices.length):0;
+  const maxPrice = prices.length?Math.max(...prices):0;
+  const minPrice = prices.length?Math.min(...prices):0;
+
+  // Duplicate phone count
+  const phoneCounts = {};
+  offers.forEach(o=>{if(o.ownerPhone) phoneCounts[o.ownerPhone]=(phoneCounts[o.ownerPhone]||0)+1;});
+  const dupCount = Object.values(phoneCounts).filter(n=>n>1).length;
+
+  let h = '<div style="padding-bottom:18px"><div class="sec-title">📊 إحصائيات العروض</div>'+
+    '<div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center">'+
+    '<div style="font-size:42px;font-weight:900;color:var(--primary)">'+total+'</div><div style="color:var(--muted);font-size:13px">إجمالي العروض</div>'+
+    (dupCount?'<div style="color:#f97316;font-size:11px;margin-top:5px">⚠️ '+dupCount+' رقم جوال مكرر</div>':'')+'</div>'+
+    '<div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px">توزيع الاتجاهات</div>'+
+    '<div style="background:rgba(5,150,105,.06);border-radius:12px;overflow:hidden;margin-bottom:12px">';
+  byDir.forEach(({d,n})=>{
+    const c=DC[d], pct=total?Math.round(n/total*100):0;
+    h += '<div style="display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid rgba(5,150,105,.1)">'+
+      '<span class="chip" style="background:'+c.badge+';width:40px;text-align:center">'+d+'</span>'+
+      '<div style="flex:1;background:rgba(255,255,255,.06);border-radius:6px;height:8px;overflow:hidden">'+
+      '<div style="width:'+pct+'%;height:100%;background:'+c.badge+';border-radius:6px;transition:width .5s"></div></div>'+
+      '<span style="color:'+c.badge+';font-weight:800;font-size:13px;min-width:24px;text-align:left">'+n+'</span></div>';
+  });
+  h += '</div>';
+
+  if(byType.length){
+    h += '<div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px">حسب نوع العقار</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px">';
+    byType.forEach(({t,n})=>{h+='<div style="background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.18);border-radius:11px;padding:11px;text-align:center"><div style="font-size:20px;font-weight:900;color:var(--primary)">'+n+'</div><div style="color:var(--muted);font-size:11px;margin-top:2px">'+t+'</div></div>';});
+    h += '</div>';
+  }
+
+  if(prices.length){
+    h += '<div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px">إحصائيات السعر (ريال)</div>'+
+      '<div style="background:rgba(5,150,105,.06);border-radius:12px;overflow:hidden;margin-bottom:12px">'+
+      [['متوسط السعر',fp(avgPrice)],['أعلى سعر',fp(maxPrice)],['أقل سعر',fp(minPrice)]].map(([k,v])=>
+        '<div class="det-row" style="padding:11px 13px"><span class="det-k">'+k+'</span><span class="det-v" style="color:var(--primary)">'+v+' ﷼</span></div>'
+      ).join('')+'</div>';
+  }
+  h += '<button class="btn b-red" style="margin-top:4px" onclick="clearAll()">🗑️ حذف جميع العروض</button></div>';
+  return h;
+}
+
+// ── Detail sheet ──────────────────────────────────────────────
+function openDetail(id){
+  const o = offers.find(z=>z.id===id); if(!o) return;
+  const c = DC[o.direction]||{badge:'#64748b'};
+  // Check duplicates
+  const phoneCounts = {};
+  offers.forEach(oo=>{if(oo.ownerPhone) phoneCounts[oo.ownerPhone]=(phoneCounts[oo.ownerPhone]||0)+1;});
+  const isDup = o.ownerPhone && phoneCounts[o.ownerPhone]>1;
+
+  const rows = [
+    ['الاتجاه',o.direction||'—'],['الحي',o.neighborhood||'—'],
+    ['نوع العقار',o.propertyType||'—'],['المساحة',o.area?o.area+' م²':'—'],
+    ['السعر',o.price?fp(o.price)+' ﷼':'—'],
+  ].map(([k,v])=>'<div class="det-row"><span class="det-k">'+k+'</span><span class="det-v">'+x(v)+'</span></div>').join('');
+
+  document.getElementById('detSheet').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
+    '<div style="display:flex;gap:6px;align-items:center">'+
+    (o.direction?'<span class="chip" style="background:'+c.badge+';font-size:13px;padding:5px 13px">'+o.direction+'</span>':'')+
+    (isDup?'<span class="chip" style="background:#f97316;font-size:11px;padding:4px 9px">⚠️ مكرر</span>':'')+
+    '</div>'+
+    '<button onclick="closeOverlay(\'detOverlay\')" style="background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;padding:4px">✕</button></div>'+
+    '<div style="font-size:19px;font-weight:900;margin-bottom:3px;color:var(--text)">'+x(o.ownerName||'—')+'</div>'+
+    '<div style="color:var(--muted);font-size:14px;margin-bottom:16px;direction:ltr;text-align:right">'+x(o.ownerPhone||'')+'</div>'+
+    rows+
+    '<div class="act-row">'+
+    '<button class="btn b-primary" onclick="startEdit(\''+o.id+'\')">✏️ تعديل</button>'+
+    '<button class="btn b-orange" onclick="shareOffer(\''+o.id+'\')">📤 مشاركة</button>'+
+    '<button class="btn b-red" onclick="openDel(\''+o.id+'\')">🗑️ حذف</button>'+
+    '</div>';
+  document.getElementById('detOverlay').style.display = 'flex';
+}
+
+// ── Share ─────────────────────────────────────────────────────
+function shareOffer(id){
+  const o = offers.find(z=>z.id===id); if(!o) return;
+  const lines = ['🏡 عرض عقاري',
+    o.direction   ?'📍 الاتجاه: '+o.direction:'',
+    o.neighborhood?'🏘️ الحي: '+o.neighborhood:'',
+    o.ownerName   ?'👤 المالك: '+o.ownerName:'',
+    o.ownerPhone  ?'📞 الجوال: '+o.ownerPhone:'',
+    o.propertyType?'🏗️ النوع: '+o.propertyType:'',
+    o.area        ?'📐 المساحة: '+o.area+' م²':'',
+    o.price       ?'💰 السعر: '+fp(o.price)+' ﷼':'',
+  ].filter(Boolean).join('\n');
+  if(navigator.share){navigator.share({title:'عرض عقاري',text:lines}).catch(()=>{});}
+  else{navigator.clipboard.writeText(lines).then(()=>toast('✅ تم نسخ المعلومات')).catch(()=>{});}
+  closeOverlay('detOverlay');
+}
+
+// ── Edit / Submit ─────────────────────────────────────────────
+function startEdit(id){
+  const o = offers.find(z=>z.id===id); if(!o) return;
+  form={...o};editId=id;dupWarn=null;
+  closeOverlay('detOverlay');goTab(1);
+}
+function sf(field,val){syncFormFromDOM();form[field]=val;render();}
+function submitForm(){
+  syncFormFromDOM();
+  const phone = form.ownerPhone;
+  if(phone){
+    const dup = findDup(phone, editId);
+    if(dup){
+      // Don't delete, just save with warning flag and notify
+      toast('⚠️ تم الحفظ — الرقم موجود مسبقاً للمالك: '+dup.ownerName,'warn');
+    }
+  }
+  if(editId){
+    offers = offers.map(o=>o.id===editId?{...form,id:editId}:o);
+    toast('✅ تم حفظ التعديل');
+  } else {
+    offers.unshift({...form,id:gid()});
+    if(!phone||!findDup(phone,offers[0].id)) toast('✅ تمت إضافة العرض');
+  }
+  form=EF();editId=null;dupWarn=null;save();goTab(0);
+}
+function cancelEdit(){syncFormFromDOM();form=EF();editId=null;dupWarn=null;goTab(0);}
+
+// ── Delete ────────────────────────────────────────────────────
+function openDel(id){delId=id;closeOverlay('detOverlay');document.getElementById('delOverlay').style.display='flex';}
+function confirmDel(){offers=offers.filter(o=>o.id!==delId);toast('🗑️ تم الحذف','info');closeOverlay('delOverlay');save();}
+function clearAll(){
+  if(!confirm('⚠️ هل أنت متأكد من حذف جميع العروض؟')) return;
+  offers=[];toast('🗑️ تم حذف جميع العروض','info');save();
+}
+
+// ── Export JSON ───────────────────────────────────────────────
+function exportJSON(){
+  if(!offers.length){toast('لا توجد بيانات للتصدير','err');return;}
+  const data = JSON.stringify(offers, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data],{type:'application/json;charset=utf-8;'}));
+  a.download = 'عروض_عقارية_'+new Date().toLocaleDateString('ar-SA').replace(/\//g,'-')+'.json';
+  a.click();
+  toast('📤 تم تصدير '+offers.length+' عرض');
+}
+
+// ── Install banner ────────────────────────────────────────────
+function dismissBanner(){showBanner=false;localStorage.setItem(INSTALL_KEY,'1');render();}
+
+// ── Helpers ───────────────────────────────────────────────────
+function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function fp(v){const n=Number(String(v).replace(/,/g,''));return isNaN(n)?v:n.toLocaleString('ar-SA');}
+function x(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+init();
+</script>
+</body>
+</html>
