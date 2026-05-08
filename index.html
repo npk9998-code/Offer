@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="طلبات المشترين">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#071a0f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>طلبات المشترين العقارية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ── الثيم الأخضر الداكن ── */
+  --primary:#22c55e;--primary-d:#16a34a;--primary-dd:#15803d;
+  --bg:#071a0f;--surf:#0d2818;--surf2:#061510;
+  --border:rgba(255,255,255,.07);
+  --text:#f0fdf4;--muted:#86efac;--dim:#4ade80;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+}
+/* ألوان الاتجاهات — ثابتة في التطبيقين */
+:root{
+  --dn-bg:#fef2f2;--dn-border:#fca5a5;--dn-badge:#ef4444;--dn-text:#991b1b;
+  --ds-bg:#fefce8;--ds-border:#fde047;--ds-badge:#ca8a04;--ds-text:#713f12;
+  --de-bg:#eff6ff;--de-border:#93c5fd;--de-badge:#2563eb;--de-text:#1e3a8a;
+  --dw-bg:#f0fdf4;--dw-border:#86efac;--dw-badge:#16a34a;--dw-text:#14532d;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100%}
+input,select,textarea{font-size:16px!important;font-family:'Tajawal',sans-serif}
+@media(max-width:639px){
+  body{position:fixed;width:100%;top:0;left:0;right:0;bottom:0;overflow:hidden}
+  #app{height:100%;overflow:hidden}
+  .scroll{overflow-y:auto;-webkit-overflow-scrolling:touch}
+}
+@media(min-width:640px){
+  body{padding:calc(var(--st)+16px) 16px calc(var(--sb)+16px);background:#020d05}
+  #app{border-radius:22px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+  .scroll{overflow-y:auto;max-height:calc(100vh - 260px)}
+}
+#app{display:flex;flex-direction:column;width:100%;max-width:680px;margin:0 auto;background:var(--bg);position:relative}
+.hdr{background:linear-gradient(160deg,#0a2e16 0%,#071a0f 100%);padding:calc(var(--st)+12px) 16px 12px;border-bottom:1px solid rgba(34,197,94,.28);flex-shrink:0}
+.hdr-row{display:flex;align-items:center;gap:11px}
+.hdr-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--primary),var(--primary-d));border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 18px rgba(34,197,94,.38)}
+.hdr-title{font-size:16px;font-weight:800;color:var(--text);line-height:1.2}
+.hdr-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:2px}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.stats{display:flex;gap:7px;margin-top:11px;overflow-x:auto;padding-bottom:1px;scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}
+.stat{flex:0 0 auto;border-radius:10px;padding:7px 14px;text-align:center;border:1px solid;min-width:64px;cursor:pointer;transition:transform .13s}
+.stat:active{transform:scale(.93)}
+.stat.on{outline:2px solid var(--primary)}
+.stat-n{font-size:21px;font-weight:900;line-height:1}
+.stat-l{font-size:10px;color:var(--muted);margin-top:1px}
+.scroll{flex:1;overscroll-behavior:contain;padding:12px 13px 6px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.tabs{display:flex;background:var(--surf2);border-top:1px solid var(--border);flex-shrink:0;padding-bottom:var(--sb)}
+.tab{flex:1;padding:9px 0 7px;border:none;background:transparent;color:#2d6a4f;font-size:11px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:700;border-top:2.5px solid transparent;transition:all .18s;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.tab.on{color:var(--primary);border-top-color:var(--primary)}
+.tab-ic{font-size:19px;display:block;margin-bottom:2px}
+.inp{width:100%;padding:12px 13px;border-radius:11px;border:1.5px solid #1a3a26;background:var(--surf2);color:var(--text);font-size:16px;font-family:'Tajawal',sans-serif;-webkit-appearance:none;outline:none;transition:border-color .18s,box-shadow .18s}
+.inp:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(34,197,94,.18)}
+textarea.inp{resize:vertical}
+.lbl{display:block;color:var(--muted);font-size:12px;margin-bottom:5px;font-weight:600}
+.field{margin-bottom:13px}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
+.btn{border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s;-webkit-user-select:none;user-select:none;touch-action:manipulation;width:100%;display:block}
+.btn:active{transform:scale(.96)}
+.b-primary{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.28)}
+.b-red{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff}
+.b-ghost{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+.b-teal{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff}
+.b-amber{background:linear-gradient(135deg,#d97706,#b45309);color:#fff}
+.b-orange{background:linear-gradient(135deg,#ea580c,#c2410c);color:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:800;color:#fff}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dbtn{border-radius:11px;padding:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s;touch-action:manipulation;border-width:2px;border-style:solid}
+.dbtn:active{transform:scale(.95)}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tbtn{border-radius:11px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s;touch-action:manipulation;border:2px solid #1a3a26;background:rgba(255,255,255,.03);color:var(--muted)}
+.tbtn.on{border-color:var(--primary);background:rgba(34,197,94,.14);color:var(--dim)}
+.tbtn:active{transform:scale(.95)}
+.filter-row{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.fpill{flex:0 0 auto;padding:5px 13px;border-radius:20px;font-size:12px;font-weight:800;border:1.5px solid #1a3a26;background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;font-family:'Tajawal',sans-serif;touch-action:manipulation;transition:all .15s}
+.fpill.on{background:rgba(34,197,94,.15);border-color:var(--primary);color:var(--dim)}
+.fpill:active{transform:scale(.94)}
+.card{border-radius:14px;padding:13px 14px;margin-bottom:9px;border-width:1.5px;border-style:solid;cursor:pointer;transition:transform .13s,filter .13s;-webkit-user-select:none;user-select:none;touch-action:manipulation;position:relative}
+.card:active{transform:scale(.985);filter:brightness(.88)}
+.card.duplicate{outline:2.5px solid #f97316!important;outline-offset:2px}
+.match-badge{position:absolute;top:10px;left:12px;font-size:18px;line-height:1;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fIn .2s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--surf);border-radius:22px 22px 0 0;width:100%;max-width:680px;padding:22px 18px;padding-bottom:calc(22px + var(--sb));max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;animation:sUp .22s ease}
+.sheet::-webkit-scrollbar{display:none}
+@keyframes sUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast{position:fixed;top:calc(var(--st)+14px);left:50%;transform:translateX(-50%);z-index:9999;color:#fff;padding:10px 20px;border-radius:12px;font-weight:800;font-size:13px;font-family:'Tajawal',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.55);white-space:nowrap;max-width:92vw;animation:tIn .22s ease}
+@keyframes tIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+.dup-warn{background:rgba(249,115,22,.12);border:1.5px solid rgba(249,115,22,.4);border-radius:10px;padding:10px 13px;margin-bottom:12px;color:#fb923c;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.match-card{background:rgba(34,197,94,.06);border:1.5px solid rgba(34,197,94,.22);border-radius:12px;padding:12px 13px;margin-bottom:8px}
+.match-card-title{font-size:13px;font-weight:900;color:var(--dim);margin-bottom:6px}
+.match-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)}
+.match-row span:last-child{color:var(--text);font-weight:700}
+.det-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.det-k{color:#2d6a4f;font-size:13px}
+.det-v{color:var(--text);font-size:13px;font-weight:700;max-width:60%;text-align:left;word-break:break-all}
+.act-row{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
+.act-row .btn{flex:1;min-width:80px}
+.srow{display:flex;gap:8px;margin-bottom:10px}
+.swrap{flex:1;position:relative}
+.sic{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#2d6a4f;font-size:14px;pointer-events:none}
+.sinp{padding-right:36px}
+.csvbtn{padding:0 13px;font-size:12px;white-space:nowrap;width:auto}
+.empty{text-align:center;color:#2d6a4f;padding:55px 20px}
+.e-ic{font-size:50px;margin-bottom:11px}
+.e-t{font-size:15px;font-weight:800;color:var(--muted)}
+.e-s{color:#2d6a4f;font-size:12px;margin-top:5px}
+.install-banner{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.22);border-radius:12px;padding:11px 14px;margin-bottom:13px;display:flex;align-items:center;gap:10px}
+.install-banner-text{flex:1;font-size:12px;color:var(--muted);line-height:1.4}
+.install-banner-title{font-size:13px;font-weight:800;color:var(--primary);margin-bottom:2px}
+.install-x{background:none;border:none;color:#2d6a4f;font-size:18px;cursor:pointer;padding:4px;touch-action:manipulation;line-height:1}
+.offers-db-bar{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:10px;padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.offers-db-info{font-size:11px;color:var(--muted)}
+.offers-db-count{font-size:13px;font-weight:900;color:var(--dim)}
+.sec-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:var(--text);margin-bottom:16px}
+.form-note{text-align:center;color:#2d6a4f;font-size:11px;margin-top:14px;line-height:1.6}
+.active-filters{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.af-tag{background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.3);color:var(--dim);font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.af-x{cursor:pointer;font-size:13px;line-height:1}
+.import-drop{display:block;background:rgba(34,197,94,.07);border:2px dashed rgba(34,197,94,.3);border-radius:14px;padding:22px;text-align:center;cursor:pointer;margin-bottom:14px;transition:background .18s}
+.import-drop:hover{background:rgba(34,197,94,.13)}
+.how-box{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.7}
+.how-box b{color:var(--primary)}
+.progress-bar{height:5px;border-radius:5px;background:rgba(34,197,94,.15);overflow:hidden;margin:6px 0 2px}
+.progress-fill{height:100%;border-radius:5px;background:var(--primary);transition:width .4s}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div class="hdr-icon">🔍</div>
+      <div style="flex:1;min-width:0">
+        <div class="hdr-title">طلبات المشترين العقارية</div>
+        <div class="hdr-sub">
+          <span class="sdot"></span>
+          <span id="stxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">جاري التحميل...</span>
+        </div>
+      </div>
+      <div style="background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.32);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:800;color:#86efac">🔑 مشترون</div>
+    </div>
+    <div class="stats" id="statsRow"></div>
+  </div>
+  <div class="scroll" id="scroll"></div>
+  <div class="tabs">
+    <button class="tab on" id="t0" onclick="goTab(0)"><span class="tab-ic">👥</span>الطلبات</button>
+    <button class="tab" id="t1" onclick="goTab(1)"><span class="tab-ic">➕</span>إضافة</button>
+    <button class="tab" id="t2" onclick="goTab(2)"><span class="tab-ic">📊</span>إحصائيات</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="display:none"></div>
+
+<!-- Delete overlay -->
+<div class="overlay" id="delOverlay" style="display:none" onclick="closeOverlay('delOverlay')">
+  <div class="sheet" onclick="event.stopPropagation()" style="text-align:center">
+    <div style="font-size:46px;margin-bottom:8px">🗑️</div>
+    <div style="font-size:16px;font-weight:900;margin-bottom:5px">حذف الطلب؟</div>
+    <div style="color:var(--muted);font-size:12px;margin-bottom:22px">لا يمكن التراجع عن هذا الإجراء</div>
+    <div style="display:flex;gap:9px">
+      <button class="btn b-red" onclick="confirmDel()">نعم، احذف</button>
+      <button class="btn b-ghost" onclick="closeOverlay('delOverlay')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail overlay -->
+<div class="overlay" id="detOverlay" style="display:none" onclick="closeOverlay('detOverlay')">
+  <div class="sheet" id="detSheet" onclick="event.stopPropagation()"></div>
+</div>
+
+<!-- Import OFFERS overlay (من تطبيق الملاك) -->
+<div class="overlay" id="importOffersOverlay" style="display:none" onclick="closeOverlay('importOffersOverlay')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div style="font-size:15px;font-weight:900;margin-bottom:6px;color:var(--text)">📥 استيراد عروض الملاك</div>
+    <div class="how-box">
+      💡 <b>كيفية الاستخدام:</b><br>
+      1. افتح <b>تطبيق عروض الملاك</b><br>
+      2. اضغط زر <b>📤 تصدير JSON</b><br>
+      3. أرسل الملف لجهازك (واتساب / إيميل)<br>
+      4. اضغط «اختيار ملف» أدناه
+    </div>
+    <label class="import-drop">
+      <div style="font-size:32px;margin-bottom:6px">📂</div>
+      <div style="color:var(--dim);font-weight:800;font-size:13px">اضغط لاختيار ملف JSON (عروض الملاك)</div>
+      <input type="file" accept=".json" style="display:none" onchange="doImportOffers(this)">
+    </label>
+    <button class="btn b-ghost" onclick="closeOverlay('importOffersOverlay')">إلغاء</button>
+  </div>
+</div>
+
+<!-- Import BUYERS overlay (استيراد قائمة مشترين) -->
+<div class="overlay" id="importBuyersOverlay" style="display:none" onclick="closeOverlay('importBuyersOverlay')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div style="font-size:15px;font-weight:900;margin-bottom:6px;color:var(--text)">📲 استيراد قائمة مشترين</div>
+    <div class="how-box">
+      💡 <b>كيفية النقل بين الأجهزة:</b><br>
+      1. في الجهاز القديم: افتح الإحصائيات → <b>📤 تصدير المشترين JSON</b><br>
+      2. أرسل الملف لجهازك الجديد<br>
+      3. افتح التطبيق → استيراد مشترين → اختر الملف<br>
+      <br>
+      ⚠️ المشترون المكررون (نفس الجوال) <b>لا يُحذفون</b> بل يُميَّزون بإطار برتقالي
+    </div>
+    <label class="import-drop">
+      <div style="font-size:32px;margin-bottom:6px">👥</div>
+      <div style="color:var(--dim);font-weight:800;font-size:13px">اضغط لاختيار ملف JSON (مشترون)</div>
+      <input type="file" accept=".json" style="display:none" onchange="doImportBuyers(this)">
+    </label>
+    <div id="importBuyersProgress" style="display:none">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div id="progressText" style="color:var(--muted);font-size:12px;text-align:center;margin-top:4px">جاري الاستيراد...</div>
+    </div>
+    <button class="btn b-ghost" onclick="closeOverlay('importBuyersOverlay')">إلغاء</button>
+  </div>
+</div>
+
+<script>
+const DC={
+  'شمال':{bg:'#fef2f2',border:'#fca5a5',badge:'#ef4444',text:'#991b1b'},
+  'جنوب':{bg:'#fefce8',border:'#fde047',badge:'#ca8a04',text:'#713f12'},
+  'شرق': {bg:'#eff6ff',border:'#93c5fd',badge:'#2563eb',text:'#1e3a8a'},
+  'غرب': {bg:'#f0fdf4',border:'#86efac',badge:'#16a34a',text:'#14532d'},
+};
+const DIRS=['شمال','جنوب','شرق','غرب'];
+const TYPES=['أرض','فيلا','عمارة','شقة','محل'];
+const BUYERS_KEY='buyers_requests_v2';
+const OFFERS_KEY='imported_offers_v2';
+const INSTALL_KEY='buyers_install_v2';
+
+let buyers=[],importedOffers=[],tab=0,editId=null,delId=null,showBanner=false;
+let search='',filterDirs=[],filterTypes=[];
+let toastT=null;
+
+const EF=()=>({buyerName:'',buyerPhone:'',neighborhood:'',propertyType:'',minArea:'',maxArea:'',minBudget:'',maxBudget:'',direction:'',notes:''});
+let form=EF();
+
+// ── Init ──────────────────────────────────────────────────
+function init(){
+  try{buyers=JSON.parse(localStorage.getItem(BUYERS_KEY)||'[]');}catch(e){buyers=[];}
+  try{importedOffers=JSON.parse(localStorage.getItem(OFFERS_KEY)||'[]');}catch(e){importedOffers=[];}
+  showBanner=!localStorage.getItem(INSTALL_KEY)&&!window.matchMedia('(display-mode: standalone)').matches;
+  render();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+function saveBuyers(){try{localStorage.setItem(BUYERS_KEY,JSON.stringify(buyers));}catch(e){}render();}
+function saveOffers(){try{localStorage.setItem(OFFERS_KEY,JSON.stringify(importedOffers));}catch(e){}}
+
+// ── Toast ─────────────────────────────────────────────────
+function toast(msg,type='ok'){
+  clearTimeout(toastT);
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.style.display='block';
+  el.style.background=type==='err'?'#dc2626':type==='warn'?'#f97316':type==='info'?'#0284c7':type==='match'?'#7c3aed':'#15803d';
+  toastT=setTimeout(()=>el.style.display='none',3800);
+}
+
+// ── Smart Matching ─────────────────────────────────────────
+function findMatchesForBuyer(b){
+  if(!importedOffers.length) return [];
+  return importedOffers.filter(o=>{
+    if(b.direction && o.direction && b.direction!==o.direction) return false;
+    if(b.neighborhood && o.neighborhood){
+      const bN=b.neighborhood.replace(/حي\s*/,'').trim();
+      const oN=o.neighborhood.replace(/حي\s*/,'').trim();
+      if(bN&&oN&&!oN.includes(bN)&&!bN.includes(oN)) return false;
+    }
+    if(b.propertyType && o.propertyType && b.propertyType!==o.propertyType) return false;
+    const oPrice=Number(String(o.price||'0').replace(/,/g,''));
+    if(oPrice>0){
+      const minB=Number(String(b.minBudget||'0').replace(/,/g,''));
+      const maxB=Number(String(b.maxBudget||'0').replace(/,/g,''));
+      if(minB>0&&oPrice<minB) return false;
+      if(maxB>0&&oPrice>maxB) return false;
+    }
+    const oArea=Number(o.area||0);
+    if(oArea>0){
+      const minA=Number(b.minArea||0);
+      const maxA=Number(b.maxArea||0);
+      if(minA>0&&oArea<minA) return false;
+      if(maxA>0&&oArea>maxA) return false;
+    }
+    return true;
+  });
+}
+function hasMatch(b){return findMatchesForBuyer(b).length>0;}
+
+// ── Duplicate detection ───────────────────────────────────
+function findDuplicates(){
+  const phoneMap={},dup=new Set();
+  buyers.forEach(b=>{
+    if(b.buyerPhone){
+      if(phoneMap[b.buyerPhone]!==undefined) dup.add(b.id);
+      else phoneMap[b.buyerPhone]=true;
+    }
+  });
+  return dup;
+}
+
+// ── Sync form ─────────────────────────────────────────────
+function syncFormFromDOM(){
+  ['buyerName','buyerPhone','neighborhood','minArea','maxArea','minBudget','maxBudget','notes'].forEach(k=>{
+    const el=document.getElementById('f_'+k);
+    if(el) form[k]=el.value;
+  });
+}
+
+// ── Navigation ────────────────────────────────────────────
+function goTab(n){
+  if(tab===1) syncFormFromDOM();
+  tab=n;
+  if(n!==1&&editId){editId=null;form=EF();}
+  [0,1,2].forEach(i=>document.getElementById('t'+i).className='tab'+(i===n?' on':''));
+  render();
+}
+function closeOverlay(id){document.getElementById(id).style.display='none';}
+function toggleDirFilter(d){const i=filterDirs.indexOf(d);if(i>=0)filterDirs.splice(i,1);else filterDirs.push(d);if(tab!==0)goTab(0);else render();}
+function toggleTypeFilter(t){const i=filterTypes.indexOf(t);if(i>=0)filterTypes.splice(i,1);else filterTypes.push(t);render();}
+function clearFilters(){filterDirs=[];filterTypes=[];render();}
+
+function filtered(){
+  let res=buyers;
+  if(search.trim()){const q=search.trim();res=res.filter(b=>[b.buyerName,b.buyerPhone,b.direction,b.propertyType,b.neighborhood].some(v=>v&&v.includes(q)));}
+  if(filterDirs.length) res=res.filter(b=>filterDirs.includes(b.direction));
+  if(filterTypes.length) res=res.filter(b=>filterTypes.includes(b.propertyType));
+  return res;
+}
+
+// ── Render ────────────────────────────────────────────────
+function render(){
+  renderStats();
+  const matchCount=buyers.filter(b=>hasMatch(b)).length;
+  document.getElementById('stxt').textContent=buyers.length+' طلب'+(matchCount?' • ✨ '+matchCount+' تطابق':'')+'  • محفوظ';
+  const sc=document.getElementById('scroll');
+  if(tab===0) sc.innerHTML=renderList();
+  else if(tab===1) sc.innerHTML=renderForm();
+  else sc.innerHTML=renderStats2();
+}
+
+function renderStats(){
+  document.getElementById('statsRow').innerHTML=DIRS.map(d=>{
+    const c=DC[d],n=buyers.filter(b=>b.direction===d).length;
+    const active=filterDirs.includes(d);
+    return '<div class="stat'+(active?' on':'')+'" style="background:'+c.badge+'20;border-color:'+c.border+'" onclick="toggleDirFilter(\''+d+'\')">'
+      +'<div class="stat-n" style="color:'+c.badge+'">'+n+'</div>'
+      +'<div class="stat-l">'+d+(active?' ✓':'')+'</div></div>';
+  }).join('');
+}
+
+// ── List tab ──────────────────────────────────────────────
+function renderList(){
+  const fil=filtered();
+  const dups=findDuplicates();
+  let h='';
+
+  if(showBanner){
+    h+='<div class="install-banner"><div style="font-size:26px">📲</div><div class="install-banner-text"><div class="install-banner-title">أضف للشاشة الرئيسية</div>مشاركة ↑ ثم «إضافة إلى الشاشة الرئيسية»</div><button class="install-x" onclick="dismissBanner()">✕</button></div>';
+  }
+
+  // Offers DB + import buyers buttons
+  h+='<div class="offers-db-bar">'
+    +'<div><div class="offers-db-count">🏠 '+importedOffers.length+' عرض مستورد</div>'
+    +'<div class="offers-db-info">قاعدة بيانات عروض الملاك</div></div>'
+    +'<div style="display:flex;gap:6px">'
+    +'<button class="btn b-primary" style="width:auto;padding:7px 12px;font-size:11px" onclick="document.getElementById(\'importOffersOverlay\').style.display=\'flex\'">🏠 عروض</button>'
+    +'<button class="btn b-teal" style="width:auto;padding:7px 12px;font-size:11px" onclick="document.getElementById(\'importBuyersOverlay\').style.display=\'flex\'">👥 مشترون</button>'
+    +'</div></div>';
+
+  // Search row
+  h+='<div class="srow">'
+    +'<div class="swrap"><span class="sic">🔍</span>'
+    +'<input id="searchInp" class="inp sinp" type="search" placeholder="بحث..." value="'+x(search)+'" oninput="onSearch(this.value)" autocomplete="off" spellcheck="false"></div>'
+    +'<button class="btn b-amber csvbtn" onclick="exportBuyersJSON()" title="تصدير المشترين" style="min-width:44px;padding:0 11px">📤</button>'
+    +'</div>';
+
+  // Active filters
+  const anyFilter=filterDirs.length||filterTypes.length;
+  if(anyFilter){
+    h+='<div class="active-filters">';
+    filterDirs.forEach(d=>{const c=DC[d];h+='<span class="af-tag" style="background:'+c.badge+'22;border-color:'+c.badge+'66;color:'+c.badge+'">'+d+' <span class="af-x" onclick="toggleDirFilter(\''+d+'\')">✕</span></span>';});
+    filterTypes.forEach(t=>{h+='<span class="af-tag">'+t+' <span class="af-x" onclick="toggleTypeFilter(\''+t+'\')">✕</span></span>';});
+    h+='<span style="color:#2d6a4f;font-size:11px;cursor:pointer;text-decoration:underline" onclick="clearFilters()">مسح الكل</span></div>';
+  }
+
+  // Type filter pills
+  h+='<div class="filter-row">';
+  h+='<span class="fpill'+(filterTypes.length===0?' on':'')+'" onclick="filterTypes=[];render()">الكل</span>';
+  TYPES.forEach(t=>{const n=buyers.filter(b=>b.propertyType===t).length;h+='<span class="fpill'+(filterTypes.includes(t)?' on':'')+'" onclick="toggleTypeFilter(\''+t+'\')">'+t+(n?' ('+n+')':'')+'</span>';});
+  h+='</div>';
+
+  // Dup warning
+  if(dups.size>0){
+    h+='<div class="dup-warn">⚠️ يوجد '+dups.size+' مشترٍ بجوال مكرر — محدد بإطار برتقالي</div>';
+  }
+
+  if(!fil.length){
+    h+='<div class="empty"><div class="e-ic">'+(search||anyFilter?'🔍':'👥')+'</div>'
+      +'<div class="e-t">'+(search||anyFilter?'لا نتائج مطابقة':'لا توجد طلبات بعد')+'</div>'
+      +(!search&&!anyFilter?'<div class="e-s">اضغط «إضافة» لتسجيل أول طلب مشترٍ</div>':'')+'</div>';
+  } else {
+    fil.forEach((b,i)=>{
+      const c=DC[b.direction]||{bg:'#f1f5f9',border:'#cbd5e1',badge:'#64748b',text:'#1e293b'};
+      const isDup=dups.has(b.id);
+      const matched=hasMatch(b);
+      const matchCount=importedOffers.length?findMatchesForBuyer(b).length:0;
+
+      h+='<div class="card'+(isDup?' duplicate':'')+'" style="background:'+c.bg+';border-color:'+c.border+(matched?';box-shadow:0 0 0 2px rgba(34,197,94,.35)':'')+'" onclick="openDetail(\''+b.id+'\')">'
+        +(matched?'<div class="match-badge">✨</div>':'')
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">'
+        +'<div style="display:flex;gap:5px;flex-wrap:wrap">'
+        +(b.direction?'<span class="chip" style="background:'+c.badge+'">'+b.direction+'</span>':'')
+        +(b.propertyType?'<span style="color:'+c.text+';font-size:10px;background:'+c.badge+'22;padding:3px 7px;border-radius:6px;font-weight:800">'+b.propertyType+'</span>':'')
+        +(isDup?'<span style="background:#f97316;color:#fff;font-size:10px;padding:3px 7px;border-radius:6px;font-weight:800">⚠️ مكرر</span>':'')
+        +(matched?'<span style="background:rgba(34,197,94,.18);color:#16a34a;font-size:10px;padding:3px 7px;border-radius:6px;font-weight:800">🤝 '+matchCount+' تطابق</span>':'')
+        +'</div><span style="color:#6b7280;font-size:10px">#'+(i+1)+'</span></div>'
+        +'<div style="color:'+c.text+';font-size:15px;font-weight:900;margin-bottom:3px;'+(matched?'padding-right:26px':'')+'">'+x(b.buyerName||'—')+'</div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<span style="color:#6b7280;font-size:11px;direction:ltr">'+x(b.buyerPhone||'')+'</span>'
+        +'<span style="color:'+c.badge+';font-size:13px;font-weight:900">'
+        +(b.minBudget||b.maxBudget?(b.minBudget?fp(b.minBudget):'')+(b.minBudget&&b.maxBudget?' — ':'')+(b.maxBudget?fp(b.maxBudget):'')+' ﷼':'—')
+        +'</span></div>'
+        +(b.neighborhood?'<div style="color:#6b7280;font-size:11px;margin-top:3px">📍 '+x(b.neighborhood)+'</div>':'')
+        +((b.minArea||b.maxArea)?'<div style="color:#6b7280;font-size:11px;margin-top:2px">📐 '+(b.minArea||'*')+' — '+(b.maxArea||'*')+' م²</div>':'')
+        +(b.notes?'<div style="color:#6b7280;font-size:10px;margin-top:5px;border-top:1px solid '+c.border+';padding-top:4px;line-height:1.4">'+x(b.notes)+'</div>':'')
+        +'</div>';
+    });
+  }
+  return h;
+}
+
+function onSearch(val){
+  search=val;
+  const sc=document.getElementById('scroll');
+  if(tab===0) sc.innerHTML=renderList();
+  const inp=document.getElementById('searchInp');
+  if(inp){inp.focus();const l=inp.value.length;inp.setSelectionRange(l,l);}
+}
+
+// ── Form tab ──────────────────────────────────────────────
+function renderForm(){
+  const title=editId?'✏️ تعديل الطلب':'➕ طلب مشترٍ جديد';
+  const dirC=form.direction?DC[form.direction]:null;
+  const chip=dirC?'<span class="chip" style="background:'+dirC.badge+'">'+form.direction+'</span>':'';
+  const dirs=DIRS.map(d=>{
+    const c=DC[d],s=form.direction===d;
+    return '<button class="dbtn" onclick="sf(\'direction\',\''+d+'\')" style="border-color:'+(s?c.badge:c.border)+';background:'+(s?c.bg:'rgba(255,255,255,.03)')+';color:'+(s?c.text:'#2d6a4f')+'">'+(s?'✓ ':'')+d+'</button>';
+  }).join('');
+  const types=TYPES.map(t=>'<button class="tbtn '+(form.propertyType===t?'on':'')+'" onclick="sf(\'propertyType\',\''+t+'\')">'+t+'</button>').join('');
+  return '<div style="padding-bottom:18px">'
+    +'<div class="sec-title">'+title+' '+chip+'</div>'
+    +'<div class="field"><label class="lbl">الاتجاه المفضل</label><div class="dgrid">'+dirs+'</div></div>'
+    +'<div class="field"><label class="lbl">الحي المطلوب</label><input id="f_neighborhood" class="inp" type="text" inputmode="text" placeholder="مثال: حي النزهة" value="'+x(form.neighborhood||'')+'" autocomplete="off"></div>'
+    +'<div class="field"><label class="lbl">اسم المشتري</label><input id="f_buyerName" class="inp" type="text" inputmode="text" placeholder="مثال: خالد المطيري" value="'+x(form.buyerName||'')+'" autocomplete="off"></div>'
+    +'<div class="field"><label class="lbl">رقم الجوال</label><input id="f_buyerPhone" class="inp" type="tel" inputmode="tel" placeholder="05xxxxxxxx" value="'+x(form.buyerPhone||'')+'" autocomplete="off" style="direction:ltr;text-align:right"></div>'
+    +'<div class="field"><label class="lbl">نوع العقار المطلوب</label><div class="tgrid">'+types+'</div></div>'
+    +'<div class="dual"><div><label class="lbl">الميزانية الدنيا (﷼)</label><input id="f_minBudget" class="inp" type="text" inputmode="numeric" placeholder="800,000" value="'+x(form.minBudget||'')+'"></div>'
+    +'<div><label class="lbl">الميزانية القصوى (﷼)</label><input id="f_maxBudget" class="inp" type="text" inputmode="numeric" placeholder="1,500,000" value="'+x(form.maxBudget||'')+'"></div></div>'
+    +'<div class="dual"><div><label class="lbl">المساحة الدنيا (م²)</label><input id="f_minArea" class="inp" type="number" inputmode="numeric" placeholder="300" value="'+x(form.minArea||'')+'"></div>'
+    +'<div><label class="lbl">المساحة القصوى (م²)</label><input id="f_maxArea" class="inp" type="number" inputmode="numeric" placeholder="600" value="'+x(form.maxArea||'')+'"></div></div>'
+    +'<div class="field"><label class="lbl">ملاحظات</label><textarea id="f_notes" class="inp" rows="3" placeholder="أي تفاصيل إضافية...">'+x(form.notes||'')+'</textarea></div>'
+    +'<button class="btn b-primary" style="font-size:15px;padding:15px" onclick="submit()">'+(editId?'💾 حفظ التعديل':'✅ إضافة الطلب')+'</button>'
+    +(editId?'<button class="btn b-ghost" style="margin-top:9px" onclick="cancelEdit()">إلغاء</button>':'')
+    +'<div class="form-note">💡 لنقل البيانات بين الأجهزة: الإحصائيات → تصدير JSON → استيراد في الجهاز الآخر</div></div>';
+}
+
+// ── Stats tab ─────────────────────────────────────────────
+function renderStats2(){
+  if(!buyers.length) return '<div class="empty"><div class="e-ic">📊</div><div class="e-t">لا توجد بيانات بعد</div></div>';
+  const total=buyers.length;
+  const dups=findDuplicates();
+  const matchedCount=buyers.filter(b=>hasMatch(b)).length;
+  const byDir=DIRS.map(d=>({d,n:buyers.filter(b=>b.direction===d).length}));
+  const byType=TYPES.map(t=>({t,n:buyers.filter(b=>b.propertyType===t).length})).filter(z=>z.n>0);
+  let h='<div style="padding-bottom:18px"><div class="sec-title">📊 إحصائيات المشترين</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">'
+    +'<div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:14px;padding:14px;text-align:center">'
+    +'<div style="font-size:38px;font-weight:900;color:var(--primary)">'+total+'</div><div style="color:var(--muted);font-size:11px">إجمالي الطلبات</div></div>'
+    +'<div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:14px;padding:14px;text-align:center">'
+    +'<div style="font-size:38px;font-weight:900;color:#a78bfa">'+matchedCount+'</div><div style="color:#c4b5fd;font-size:11px">✨ تطابق ذكي</div></div>'
+    +'</div>';
+  if(dups.size>0){
+    h+='<div style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px">'
+      +'<div style="font-size:28px">⚠️</div><div><div style="font-size:18px;font-weight:900;color:#f97316">'+dups.size+'</div><div style="color:#fb923c;font-size:11px">جوال مكرر</div></div></div>';
+  }
+  // Export + import buttons
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+    +'<button class="btn b-amber" style="padding:10px;font-size:12px" onclick="exportBuyersJSON()">📤 تصدير المشترين JSON</button>'
+    +'<button class="btn b-teal" style="padding:10px;font-size:12px" onclick="document.getElementById(\'importBuyersOverlay\').style.display=\'flex\'">📲 استيراد مشترين</button>'
+    +'</div>';
+  h+='<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">'
+    +'<div><div style="color:var(--muted);font-size:11px">عروض الملاك المستوردة</div><div style="color:var(--dim);font-size:18px;font-weight:900">'+importedOffers.length+'</div></div>'
+    +'<button class="btn b-primary" style="width:auto;padding:8px 16px;font-size:12px" onclick="document.getElementById(\'importOffersOverlay\').style.display=\'flex\'">📥 تحديث العروض</button>'
+    +'</div>';
+  h+='<div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px">توزيع الاتجاهات</div>'
+    +'<div style="background:var(--surf2);border-radius:12px;overflow:hidden;margin-bottom:12px">';
+  byDir.forEach(({d,n})=>{
+    const c=DC[d],pct=total?Math.round(n/total*100):0;
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--border)">'
+      +'<span class="chip" style="background:'+c.badge+';width:40px;text-align:center">'+d+'</span>'
+      +'<div style="flex:1;background:rgba(255,255,255,.05);border-radius:6px;height:8px;overflow:hidden">'
+      +'<div style="width:'+pct+'%;height:100%;background:'+c.badge+';border-radius:6px;transition:width .5s"></div></div>'
+      +'<span style="color:'+c.badge+';font-weight:800;font-size:13px;min-width:24px;text-align:left">'+n+'</span></div>';
+  });
+  h+='</div>';
+  if(byType.length){
+    h+='<div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px">حسب نوع العقار</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px">';
+    byType.forEach(({t,n})=>{h+='<div style="background:var(--surf2);border:1px solid var(--border);border-radius:11px;padding:11px;text-align:center"><div style="font-size:20px;font-weight:900;color:var(--primary)">'+n+'</div><div style="color:var(--muted);font-size:11px;margin-top:2px">'+t+'</div></div>';});
+    h+='</div>';
+  }
+  h+='<button class="btn b-red" onclick="clearAll()">🗑️ حذف جميع الطلبات</button></div>';
+  return h;
+}
+
+// ── Detail overlay ────────────────────────────────────────
+function openDetail(id){
+  const b=buyers.find(z=>z.id===id); if(!b) return;
+  const c=DC[b.direction]||{badge:'#22c55e'};
+  const dups=findDuplicates();
+  const isDup=dups.has(b.id);
+  const matches=findMatchesForBuyer(b);
+
+  const rows=[
+    ['الاتجاه',b.direction||'—'],
+    ['الحي المطلوب',b.neighborhood||'—'],
+    ['النوع',b.propertyType||'—'],
+    ['الميزانية الدنيا',b.minBudget?fp(b.minBudget)+' ﷼':'—'],
+    ['الميزانية القصوى',b.maxBudget?fp(b.maxBudget)+' ﷼':'—'],
+    ['المساحة الدنيا',b.minArea?b.minArea+' م²':'—'],
+    ['المساحة القصوى',b.maxArea?b.maxArea+' م²':'—'],
+    ['ملاحظات',b.notes||'—']
+  ].map(([k,v])=>'<div class="det-row"><span class="det-k">'+k+'</span><span class="det-v">'+x(v)+'</span></div>').join('');
+
+  let matchSection='';
+  if(importedOffers.length===0){
+    matchSection='<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:14px;text-align:center;margin-top:16px">'
+      +'<div style="font-size:24px;margin-bottom:6px">📥</div>'
+      +'<div style="color:var(--muted);font-size:12px;font-weight:700">لم يتم استيراد عروض بعد</div>'
+      +'<div style="color:#2d6a4f;font-size:11px;margin-top:4px">استورد ملف العروض من تطبيق الملاك لبدء المطابقة</div>'
+      +'<button class="btn b-primary" style="margin-top:12px;padding:10px;font-size:12px" onclick="closeOverlay(\'detOverlay\');document.getElementById(\'importOffersOverlay\').style.display=\'flex\'">📥 استيراد عروض الملاك</button>'
+      +'</div>';
+  } else if(matches.length===0){
+    matchSection='<div style="background:rgba(100,116,139,.06);border:1px solid rgba(100,116,139,.15);border-radius:12px;padding:14px;text-align:center;margin-top:16px">'
+      +'<div style="font-size:24px;margin-bottom:6px">🔍</div>'
+      +'<div style="color:var(--muted);font-size:12px;font-weight:700">لا توجد عروض مطابقة حالياً</div>'
+      +'<div style="color:#2d6a4f;font-size:11px;margin-top:4px">بناءً على '+importedOffers.length+' عرض مستورد</div>'
+      +'</div>';
+  } else {
+    matchSection='<div style="margin-top:16px">'
+      +'<div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">'
+      +'<span style="font-size:16px">✨</span>'
+      +'<span style="font-size:14px;font-weight:900;color:var(--dim)">العروض المقترحة ('+matches.length+')</span>'
+      +'</div>';
+    matches.forEach(o=>{
+      const mc=DC[o.direction]||{badge:'#64748b',bg:'#f8fafc',border:'#e2e8f0',text:'#1e293b'};
+      matchSection+='<div class="match-card">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+        +'<span class="chip" style="background:'+mc.badge+'">'+(o.direction||'—')+'</span>'
+        +'<span style="color:'+mc.badge+';font-size:13px;font-weight:900">'+(o.price?fp(o.price)+' ﷼':'—')+'</span>'
+        +'</div>'
+        +'<div class="match-row"><span>المالك</span><span>'+x(o.sellerName||'—')+'</span></div>'
+        +'<div class="match-row"><span>الجوال</span><span style="direction:ltr">'+x(o.sellerPhone||'—')+'</span></div>'
+        +'<div class="match-row"><span>الحي</span><span>'+x(o.neighborhood||'—')+'</span></div>'
+        +'<div class="match-row"><span>النوع</span><span>'+x(o.propertyType||'—')+'</span></div>'
+        +(o.area?'<div class="match-row"><span>المساحة</span><span>'+x(o.area)+' م²'+(o.streetWidth?' • شارع '+x(o.streetWidth)+'م':'')+'</span></div>':'')
+        +(o.notes?'<div style="margin-top:5px;font-size:11px;color:#6b7280;line-height:1.4">'+x(o.notes)+'</div>':'')
+        +(o.sellerPhone?'<button class="btn b-primary" style="margin-top:10px;padding:9px;font-size:13px" onclick="callSeller(\''+x(o.sellerPhone||'')+'\')">📞 اتصل بالمالك</button>':'')
+        +'</div>';
+    });
+    matchSection+='</div>';
+  }
+
+  document.getElementById('detSheet').innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<div style="display:flex;gap:6px;align-items:center">'
+    +'<span class="chip" style="background:'+c.badge+';font-size:13px;padding:5px 13px">'+(b.direction||'أي اتجاه')+'</span>'
+    +(matches.length>0?'<span style="background:rgba(34,197,94,.18);color:#22c55e;font-size:11px;padding:4px 10px;border-radius:8px;font-weight:800">✨ '+matches.length+' تطابق</span>':'')
+    +(isDup?'<span style="background:#f97316;color:#fff;font-size:11px;padding:4px 10px;border-radius:8px;font-weight:800">⚠️ مكرر</span>':'')
+    +'</div>'
+    +'<button onclick="closeOverlay(\'detOverlay\')" style="background:none;border:none;color:#2d6a4f;font-size:20px;cursor:pointer;padding:4px">✕</button></div>'
+    +'<div style="font-size:19px;font-weight:900;margin-bottom:3px">'+x(b.buyerName||'—')+'</div>'
+    +'<div style="color:var(--muted);font-size:14px;margin-bottom:16px;direction:ltr;text-align:right">'+x(b.buyerPhone||'')+'</div>'
+    +(isDup?'<div class="dup-warn">⚠️ هذا الجوال مكرر — التسجيل محفوظ للمراجعة</div>':'')
+    +rows
+    +matchSection
+    +'<div class="act-row">'
+    +'<button class="btn b-primary" onclick="startEdit(\''+b.id+'\')">✏️ تعديل</button>'
+    +'<button class="btn b-teal" onclick="shareBuyer(\''+b.id+'\')">📤 مشاركة</button>'
+    +'<button class="btn b-red" onclick="openDel(\''+b.id+'\')">🗑️ حذف</button>'
+    +'</div>';
+  document.getElementById('detOverlay').style.display='flex';
+}
+
+function callSeller(phone){window.open('tel:'+phone);}
+
+function shareBuyer(id){
+  const b=buyers.find(z=>z.id===id); if(!b) return;
+  const lines=['🔍 طلب مشترٍ — عقاري',
+    b.direction?'📍 الاتجاه: '+b.direction:'',
+    b.neighborhood?'🏘️ الحي: '+b.neighborhood:'',
+    b.buyerName?'👤 المشتري: '+b.buyerName:'',
+    b.buyerPhone?'📞 الجوال: '+b.buyerPhone:'',
+    b.propertyType?'🏗️ النوع: '+b.propertyType:'',
+    (b.minBudget||b.maxBudget)?'💰 الميزانية: '+(b.minBudget||'*')+' — '+(b.maxBudget||'*')+' ﷼':'',
+    (b.minArea||b.maxArea)?'📐 المساحة: '+(b.minArea||'*')+' — '+(b.maxArea||'*')+' م²':'',
+    b.notes?'📝 ملاحظات: '+b.notes:'',
+  ].filter(Boolean).join('\n');
+  if(navigator.share) navigator.share({title:'طلب مشترٍ',text:lines}).catch(()=>{});
+  else navigator.clipboard.writeText(lines).then(()=>toast('✅ تم نسخ المعلومات')).catch(()=>toast('✅ تم النسخ'));
+  closeOverlay('detOverlay');
+}
+
+// ── Submit / Edit ─────────────────────────────────────────
+function startEdit(id){const b=buyers.find(z=>z.id===id);if(!b) return;form={...b};editId=id;closeOverlay('detOverlay');goTab(1);}
+function sf(field,val){syncFormFromDOM();form[field]=val;render();}
+function submit(){
+  syncFormFromDOM();
+  const phone=form.buyerPhone?.trim();
+  if(phone&&!editId){
+    const existing=buyers.find(b=>b.buyerPhone===phone);
+    if(existing) toast('⚠️ رقم الجوال مكرر — تم الحفظ وتمييزه بإطار برتقالي','warn');
+  }
+  if(editId){
+    buyers=buyers.map(b=>b.id===editId?{...form,id:editId}:b);
+    toast('✅ تم حفظ التعديل');
+  } else {
+    buyers.unshift({...form,id:gid()});
+    if(!phone) toast('✅ تمت إضافة الطلب');
+    else if(!buyers.find(b=>b.buyerPhone===phone&&b.id!==buyers[0].id)) toast('✅ تمت الإضافة');
+  }
+  form=EF();editId=null;saveBuyers();goTab(0);
+}
+function cancelEdit(){syncFormFromDOM();form=EF();editId=null;goTab(0);}
+function openDel(id){delId=id;closeOverlay('detOverlay');document.getElementById('delOverlay').style.display='flex';}
+function confirmDel(){buyers=buyers.filter(b=>b.id!==delId);toast('🗑️ تم الحذف','info');closeOverlay('delOverlay');saveBuyers();}
+function clearAll(){if(!confirm('⚠️ هل أنت متأكد من حذف جميع الطلبات؟ لا يمكن التراجع.')) return;buyers=[];toast('🗑️ تم الحذف','info');saveBuyers();}
+
+// ── Import OFFERS from sellers app ───────────────────────
+function doImportOffers(input){
+  const file=input.files[0];if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      let data=JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('ليس مصفوفة');
+      const valid=data.filter(o=>typeof o==='object'&&o!==null);
+      importedOffers=valid;
+      saveOffers();
+      closeOverlay('importOffersOverlay');
+      const matchCount=buyers.filter(b=>hasMatch(b)).length;
+      toast('✅ تم استيراد '+valid.length+' عرض'+(matchCount?' • ✨ '+matchCount+' تطابق':''),'match');
+      render();
+    }catch(err){
+      toast('❌ ملف غير صالح — تأكد أنه JSON من تطبيق عروض الملاك','err');
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+// ── Import BUYERS from another device ────────────────────
+function doImportBuyers(input){
+  const file=input.files[0];if(!file) return;
+  const prog=document.getElementById('importBuyersProgress');
+  const fill=document.getElementById('progressFill');
+  const txt=document.getElementById('progressText');
+  prog.style.display='block';fill.style.width='30%';txt.textContent='جاري قراءة الملف...';
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      fill.style.width='60%';txt.textContent='جاري المعالجة...';
+      let data=JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('ليس مصفوفة');
+      const valid=data.filter(o=>typeof o==='object'&&o!==null&&(o.buyerName||o.buyerPhone));
+
+      fill.style.width='80%';txt.textContent='جاري فحص التكرار...';
+
+      const existingIds=new Set(buyers.map(b=>b.id));
+      const existingPhones={};
+      buyers.forEach(b=>{if(b.buyerPhone) existingPhones[b.buyerPhone]=true;});
+
+      let added=0,skippedId=0,dupPhone=0;
+      const newBuyers=[];
+
+      valid.forEach(item=>{
+        if(item.id&&existingIds.has(item.id)){skippedId++;return;}
+        const nb={...EF(),...item,id:item.id||gid()};
+        newBuyers.push(nb);
+        existingIds.add(nb.id);
+        if(nb.buyerPhone&&existingPhones[nb.buyerPhone]) dupPhone++;
+        if(nb.buyerPhone) existingPhones[nb.buyerPhone]=true;
+        added++;
+      });
+
+      buyers=[...newBuyers,...buyers]; // new entries at top
+      fill.style.width='100%';txt.textContent='تم!';
+
+      setTimeout(()=>{
+        saveBuyers();
+        closeOverlay('importBuyersOverlay');
+        prog.style.display='none';fill.style.width='0%';
+
+        let msg='✅ تمت إضافة '+added+' مشترٍ';
+        if(skippedId>0) msg+=' • تخطي '+skippedId+' مكرر';
+        if(dupPhone>0) msg+=' • ⚠️ '+dupPhone+' جوال مكرر';
+        toast(msg, dupPhone>0?'warn':'ok');
+        render();
+      },400);
+    }catch(err){
+      prog.style.display='none';fill.style.width='0%';
+      toast('❌ ملف غير صالح — تأكد أنه JSON مُصدَّر من هذا التطبيق','err');
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+// ── Export buyers JSON ────────────────────────────────────
+function exportBuyersJSON(){
+  if(!buyers.length){toast('لا توجد بيانات للتصدير','err');return;}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(buyers,null,2)],{type:'application/json;charset=utf-8;'}));
+  a.download='مشترون_'+new Date().toLocaleDateString('ar-SA').replace(/\//g,'-')+'.json';
+  a.click();
+  toast('📤 تم تصدير '+buyers.length+' مشترٍ — يمكن استيراده في أي جهاز');
+}
+
+function dismissBanner(){showBanner=false;localStorage.setItem(INSTALL_KEY,'1');render();}
+function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function fp(v){const n=Number(String(v).replace(/,/g,''));return isNaN(n)?v:n.toLocaleString('ar-SA');}
+function x(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+init();
+</script>
+</body>
+</html>
